@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: Unlicensed
+pragma solidity ^0.8.0;
+contract ShEnergy {
+    address public user;
+    uint public unitprice;
+    mapping(address => uint) public usedenergy;
+
+    event EnergyConsumed(address indexed user, uint units);
+
+    constructor(uint _unitprice) {
+        user = msg.sender;
+        unitprice = _unitprice;
+    }
+
+    function consumeEnergy(uint _units) external {
+        require(_units > 0, "Energy units weren't used");
+        
+        usedenergy[msg.sender] += _units;
+        emit EnergyConsumed(msg.sender, _units);
+    }
+
+    function calculateBill(address _user) external view returns (uint) {
+        require(msg.sender == user, "Only the user can calculate the bill");
+        
+        uint unitsConsumed = usedenergy[_user];
+        return unitsConsumed * unitprice;
+    }
+}
